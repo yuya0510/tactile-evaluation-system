@@ -3,46 +3,46 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main # mainブランチにプッシュされたときに実行
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    permissions: # ★ここを追加
-      contents: read # リポジトリの内容を読み取る権限
-      pages: write # GitHub Pagesに書き込む権限
-      id-token: write # OIDCトークンを生成する権限
+    runs-on: ubuntu-latest # Ubuntu環境で実行
+    permissions: # 権限設定
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # リポジトリのコードをチェックアウト
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '20' # 使用するNode.jsのバージョン (Viteと互換性のあるLTSバージョン)
+          cache: 'npm' # npmキャッシュを有効にしてビルドを高速化
 
       - name: Install dependencies
-        run: npm install
+        run: npm install # 依存関係をインストール
 
       - name: Build project
-        run: npm run build
+        run: npm run build # プロジェクトをビルド
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3 # ビルド成果物をGitHub Pagesにアップロード
         with:
-          path: './dist'
+          path: './dist' # ビルド成果物があるディレクトリ
 
   deploy:
-    needs: build
+    needs: build # buildジョブが成功した後に実行
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    permissions: # ★ここを追加
-      id-token: write # OIDCトークンを生成する権限
-      pages: write # GitHub Pagesに書き込む権限
+    permissions: # 権限設定
+      id-token: write
+      pages: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4 # ★GitHub公式のデプロイアクション
