@@ -6,9 +6,8 @@ on:
       - main # mainブランチにプッシュされたときに実行
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest # Ubuntu環境で実行
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4 # リポジトリのコードをチェックアウト
@@ -17,6 +16,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' # 使用するNode.jsのバージョン (Viteと互換性のあるLTSバージョン)
+          cache: 'npm' # npmキャッシュを有効にしてビルドを高速化
 
       - name: Install dependencies
         run: npm install # 依存関係をインストール
@@ -24,9 +24,9 @@ jobs:
       - name: Build project
         run: npm run build # プロジェクトをビルド
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3 # GitHub Pagesにデプロイするアクション
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3 # ビルド成果物をGitHub Pagesにアップロード
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # GitHubトークン
-          publish_dir: ./dist # ビルドされたファイルがあるディレクトリ
-          # cname: example.com # カスタムドメインを使う場合はコメント解除して設定
+          path: './dist' # ビルド成果物があるディレクトリ
+
+  deploy:
